@@ -26,13 +26,13 @@ void uv::TcpServer::SetBufferMode(uv::GlobalConfig::BufferMode mode)
 }
 
 TcpServer::TcpServer(EventLoop* loop, bool tcpNoDelay)
-    :loop_(loop),
-    tcpNoDelay_(tcpNoDelay),
-    accetper_(nullptr),
-    onMessageCallback_(nullptr),
-    onNewConnectCallback_(nullptr),
-    onConnectCloseCallback_(nullptr),
-    timerWheel_(loop)
+    : loop_(loop),
+      tcpNoDelay_(tcpNoDelay),
+      acceptor_(nullptr),
+      onMessageCallback_(nullptr),
+      onNewConnectCallback_(nullptr),
+      onConnectCloseCallback_(nullptr),
+      timerWheel_(loop)
 {
 
 }
@@ -77,23 +77,23 @@ void uv::TcpServer::onAccept(EventLoop * loop, UVTcpPtr client)
 int TcpServer::bindAndListen(SocketAddr& addr)
 {
     ipv_ = addr.Ipv();
-    accetper_ = std::make_shared<TcpAcceptor>(loop_, tcpNoDelay_);
-    auto rst = accetper_->bind(addr);
+	acceptor_ = std::make_shared<TcpAcceptor>(loop_, tcpNoDelay_);
+    auto rst = acceptor_->bind(addr);
     if (0 != rst)
     {
         return rst;
     }
-	accetper_->setNewConnectionCallback(std::bind(&TcpServer::onAccept, this, std::placeholders::_1, std::placeholders::_2));
+	acceptor_->setNewConnectionCallback(std::bind(&TcpServer::onAccept, this, std::placeholders::_1, std::placeholders::_2));
     timerWheel_.start();
-    return accetper_->listen();
+    return acceptor_->listen();
 }
 
 void TcpServer::close(DefaultCallback callback)
 {
-    if (accetper_)
-        accetper_->close([this, callback]()
+    if (acceptor_)
+        acceptor_->close([this, callback]()
     {
-        for (auto& connection : connnections_)
+        for (auto& connection : connections_)
         {
             connection.second->onSocketClose();
         }
@@ -103,18 +103,18 @@ void TcpServer::close(DefaultCallback callback)
 
 void TcpServer::addConnection(std::string& name, TcpConnectionPtr connection)
 {
-    connnections_.insert(pair<string,shared_ptr<TcpConnection>>(std::move(name),connection));
+    connections_.insert(pair<string,shared_ptr<TcpConnection>>(std::move(name), connection));
 }
 
 void TcpServer::removeConnection(string& name)
 {
-    connnections_.erase(name);
+    connections_.erase(name);
 }
 
 shared_ptr<TcpConnection> TcpServer::getConnection(const string &name)
 {
-    auto rst = connnections_.find(name);
-    if(rst == connnections_.end())
+    auto rst = connections_.find(name);
+    if(rst == connections_.end())
     {
         return nullptr;
     }
