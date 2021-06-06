@@ -17,15 +17,15 @@
 using namespace uv;
 using namespace std;
 
-
-TcpClient::TcpClient(EventLoop* loop, bool tcpNoDelay)
+TcpClient::TcpClient(EventLoop* loop, bool tcpNoDelay, bool disable_log)
     :loop_(loop),
     connect_(new uv_connect_t()),
     ipv(SocketAddr::Ipv4),
     tcpNoDelay_(tcpNoDelay),
     connectCallback_(nullptr),
     onMessageCallback_(nullptr),
-    connection_(nullptr)
+    connection_(nullptr),
+    disable_log(disable_log)
 {
     connect_->data = static_cast<void*>(this);
 }
@@ -45,7 +45,6 @@ void uv::TcpClient::setTcpNoDelay(bool isNoDelay)
     tcpNoDelay_ = isNoDelay;
 }
 
-
 void TcpClient::connect(SocketAddr& addr)
 {
     update();
@@ -55,7 +54,7 @@ void TcpClient::connect(SocketAddr& addr)
         auto handle = static_cast<TcpClient*>((req->data));
         if (0 != status)
         {
-            uv::LogWriter::Instance()->error( "connect fail.");
+        	uv::LogWriter::Instance()->error( "connect fail.");
             handle->onConnect(false);
             return;
         }

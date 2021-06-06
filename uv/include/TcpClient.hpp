@@ -32,7 +32,8 @@ public:
     };
     using ConnectStatusCallback = std::function<void(ConnectStatus)>;
 public:
-    TcpClient(EventLoop* loop,bool tcpNoDelay = true);
+	const bool disable_log;
+    TcpClient(EventLoop* loop,bool tcpNoDelay = true, bool disable_log = true);
     virtual ~TcpClient();
 
     bool isTcpNoDelay();

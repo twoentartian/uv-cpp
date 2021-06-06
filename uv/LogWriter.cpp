@@ -12,7 +12,6 @@ Description: https://github.com/wlgq2/uv-cpp
 
 #include <iostream>
 
-
 using namespace uv;
 
 LogWriter* LogWriter::Instance()

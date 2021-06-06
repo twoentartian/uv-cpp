@@ -15,8 +15,9 @@ Description: https://github.com/wlgq2/uv-cpp
 #include  <functional>
 #include  <vector>
 
-#define   USED_STD_OUT     1
-
+#ifndef USED_STD_OUT
+#define USED_STD_OUT 0
+#endif
 namespace uv
 {
 
