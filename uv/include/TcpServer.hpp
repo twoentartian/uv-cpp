@@ -61,8 +61,8 @@ protected:
 private:
     bool tcpNoDelay_;
     SocketAddr::IPV ipv_;
-    std::shared_ptr <TcpAcceptor> accetper_;
-    std::map<std::string ,TcpConnectionPtr>  connnections_;
+    std::shared_ptr <TcpAcceptor> acceptor_;
+    std::map<std::string ,TcpConnectionPtr>  connections_;
 
 
     OnMessageCallback onMessageCallback_;
